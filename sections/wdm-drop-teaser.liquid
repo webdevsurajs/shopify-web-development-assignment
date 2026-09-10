@@ -1,0 +1,574 @@
+<section id="wdmDropTeaser-{{ section.id }}" class="wdm-drop-teaser" data-section-id="{{ section.id }}">
+	<div class="wdm-drop-teaser-inner">
+		<div class="wdm-drop-teaser-countdown" {% if section.settings.pattern_image != blank %} style="--wdm-pattern-image: url('{{ section.settings.pattern_image | image_url: width: 1600 }}');"{% endif %}>
+		
+			<div class="wdm-drop-teaser-countdown-content">
+				<div class="wdm-drop-teaser-countdown-top">
+					{% if section.settings.countdown_icon_image != blank %}
+						{{
+							section.settings.countdown_icon_image
+							| image_url: width: 120
+							| image_tag:
+							class: 'wdm-drop-teaser-countdown-icon',
+							loading: 'lazy',
+							alt: section.settings.countdown_icon_image.alt | escape
+						}}
+					{% endif %}
+
+					{% if section.settings.countdown_heading != blank %}
+						<div class="wdm-drop-teaser-heading">
+							<h2>{{ section.settings.countdown_heading | escape }}</h2>
+
+							{% if section.settings.heading_icon_image != blank %}
+								{{
+									section.settings.heading_icon_image
+									| image_url: width: 100
+									| image_tag:
+									class: 'wdm-drop-teaser-heading-icon',
+									loading: 'lazy',
+									alt: section.settings.heading_icon_image.alt | escape
+								}}
+							{% endif %}
+						</div>
+					{% endif %}
+				</div>	
+				<div class="wdm-countdown" data-countdown data-target="{{ section.settings.target_date | escape }}" role="timer" aria-label="{{ section.settings.countdown_heading | escape }}">
+					<div class="wdm-countdown-group">
+						<div class="wdm-countdown-digits">
+							<span class="wdm-countdown-tile" data-days-tens>0</span>
+							<span class="wdm-countdown-tile" data-days-ones>0</span>
+						</div>
+						<span class="wdm-countdown-label">Days</span>
+					</div>
+
+					<span class="wdm-countdown-separator" aria-hidden="true">:</span>
+
+					<div class="wdm-countdown-group">
+						<div class="wdm-countdown-digits">
+							<span class="wdm-countdown-tile" data-hours-tens>0</span>
+							<span class="wdm-countdown-tile" data-hours-ones>0</span>
+						</div>
+						<span class="wdm-countdown-label">Hours</span>
+					</div>
+
+					<span class="wdm-countdown-separator" aria-hidden="true">:</span>
+
+					<div class="wdm-countdown-group">
+						<div class="wdm-countdown-digits">
+						<span class="wdm-countdown-tile" data-minutes-tens>0</span>
+						<span class="wdm-countdown-tile" data-minutes-ones>0</span>
+						</div>
+						<span class="wdm-countdown-label">Minutes</span>
+					</div>
+
+          <span class="wdm-countdown-separator" aria-hidden="true">:</span>
+
+          <div class="wdm-countdown-group">
+            <div class="wdm-countdown-digits">
+              <span class="wdm-countdown-tile" data-seconds-tens>0</span>
+              <span class="wdm-countdown-tile" data-seconds-ones>0</span>
+            </div>
+            <span class="wdm-countdown-label">Seconds</span>
+          </div>
+				</div>
+				<p class="wdm-countdown-expired" data-countdown-expired hidden>The drop is now live.</p>
+			</div>
+		</div>
+
+		<div class="wdm-drop-teaser-notification" {% if section.settings.notify_bg_color != blank %}style="--wdm-notify-bg: {{ section.settings.notify_bg_color }};" {% endif %}>
+			<div class="wdm-drop-teaser-notification-inner">
+				<div class="wdm-drop-teaser-notification-top">
+					{% if section.settings.notify_image != blank %}
+						<div class="wdm-drop-teaser-notification-image">
+							{{
+								section.settings.notify_image
+								| image_url: width: 1600
+								| image_tag:
+								widths: '550, 750, 990, 1200, 1600',
+								sizes: '(min-width: 750px) 50vw, 100vw',
+								loading: 'lazy',
+								alt: section.settings.notify_heading
+							}}
+						</div>
+					{% endif %}
+					{% if section.settings.notify_heading != blank %}
+						<h2 class="wdm-drop-teaser-notification-heading">
+							{{ section.settings.notify_heading | escape }}
+						</h2>
+					{% endif %}
+				</div>
+				<div class="wdm-drop-teaser-notification-content">
+          {% if section.settings.notify_title != blank %}
+						<h3 class="wdm-drop-teaser-notification-title">
+							{{ section.settings.notify_title | escape }}
+						</h3>
+					{% endif %}
+					{% form 'customer', class: 'wdm-notify-form' %}
+            <div class="wdm-notify-form-fields">
+              <input type="hidden" name="contact[tags]" value="drop-notification">
+
+              <label class="visually-hidden" for="WdmDropEmail-{{ section.id }}">Email address</label>
+
+              <input id="WdmDropEmail-{{ section.id }}" class="wdm-notify-form-input" type="email" name="contact[email]" value="{{ form.email }}" placeholder="{{ section.settings.email_placeholder | escape }}" autocomplete="email" required>
+
+              <button class="wdm-notify-form-button" type="submit">{{ section.settings.notify_button_label | escape }}</button>
+            </div>
+
+            <div class="wdm-notify-form-messages">
+              {% if form.errors %}
+                <div class="wdm-notify-form-message wdm-notify-form-message--error" role="alert">
+                  {{ form.errors | default_errors }}
+                </div>
+              {% endif %}
+
+              {% if form.posted_successfully? %}
+                <div class="wdm-notify-form-message wdm-notify-form-message--success" role="status" tabindex="-1">
+                  {{ section.settings.success_message | escape }}
+                </div>
+              {% endif %}
+             </div>
+					{% endform %}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+.wdm-drop-teaser {
+    padding: 24px;
+}
+.wdm-drop-teaser-countdown {
+    background: #421802;
+    background-image: var(--wdm-pattern-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.wdm-drop-teaser-countdown-content {
+    display: flex;
+    flex-direction: column;
+    padding: 97px 0;
+    gap: 48px;
+}
+.wdm-drop-teaser-inner {
+    display: flex;
+    gap: 8px;
+}
+.wdm-drop-teaser-inner > * {
+    flex: 1;
+}
+.wdm-drop-teaser-countdown-top {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    justify-content: center;
+}
+.wdm-drop-teaser-countdown-top .wdm-drop-teaser-countdown-icon {
+    margin: 0 auto;
+    max-width: 120px;
+}
+.wdm-drop-teaser-heading {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+.wdm-drop-teaser-heading h2 {
+    margin: 0;
+    font-family: "La Belle Aurore", cursive;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 40px;
+    line-height: 40px;
+    letter-spacing: 0;
+    color: #FFFFFF;
+}
+.wdm-drop-teaser-heading img {
+    max-width: 26px;
+    height: 42px;
+}
+.wdm-countdown {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+.wdm-countdown-digits {
+    display: flex;
+    gap: 4px;
+}
+.wdm-countdown-digits > * {
+    flex: 1;
+}
+.wdm-countdown-digits span.wdm-countdown-tile {
+    background: rgb(255 255 255 / 85%);
+    border-radius: 4px;
+    height: 100%;
+    display: flex;
+    min-width: 46px;
+    min-height: 60px;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: #421802;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+.wdm-countdown-group .wdm-countdown-label {
+    font-family: "La Belle Aurore", cursive;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 120%;
+    letter-spacing: -2%;
+    color: #FFFFFF;
+}
+.wdm-countdown-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+}
+span.wdm-countdown-separator {
+    font-size: 0;
+    height: 60px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+span.wdm-countdown-separator:before, span.wdm-countdown-separator:after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    display: block;
+    background: #fff;
+}
+.wdm-drop-teaser-notification .wdm-drop-teaser-notification-inner {
+    background: #FFFBF8;
+    border: 1px solid #D9D9D9;
+    padding: 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 37px;
+}
+.wdm-drop-teaser-notification-image img {
+    width: 100%;
+    height: auto;
+}
+.wdm-drop-teaser-notification-image img {
+    width: 100%;
+    display: table;
+}
+.wdm-drop-teaser-notification-top {
+    position: relative;
+}
+h2.wdm-drop-teaser-notification-heading {
+    margin: 0;
+    position: absolute;
+    bottom: 0px;
+    left: 15px;
+    color: #FFFFFF;
+    font-family: "Instrument Serif", serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 72px;
+    line-height: 120%;
+    letter-spacing: -3%;
+}
+h3.wdm-drop-teaser-notification-title {
+    color: #421802;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 140%;
+    letter-spacing: 0;
+    margin: 0;
+}
+.wdm-drop-teaser-notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.wdm-notify-form-fields {
+    display: flex;
+}
+.wdm-notify-form .wdm-notify-form-input {
+    background: transparent;
+    border: 0;
+    padding: 12px 16px;
+    padding-left: 0px;
+    color: #75462D;
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 11px;
+    line-height: 140%;
+    letter-spacing: 0;
+    width: 80%;
+    border-bottom: 1px solid #421802;
+}
+.wdm-notify-form .wdm-notify-form-input::placeholder {
+    color: #75462D;
+    opacity: 1;
+}
+
+.wdm-notify-form .wdm-notify-form-input::-webkit-input-placeholder {
+    color: #75462D;
+}
+
+.wdm-notify-form .wdm-notify-form-input::-moz-placeholder {
+    color: #75462D;
+}
+
+.wdm-notify-form .wdm-notify-form-input:-ms-input-placeholder {
+    color: #75462D;
+}
+.wdm-notify-form .wdm-notify-form-button {
+    background: 0;
+    color: #421802;
+    border: 0;
+    text-transform: uppercase;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 100%;
+    padding: 16px 32px;
+    padding-right: 0;
+    width: 20%;
+    border-bottom: 1px solid #421802;
+    cursor: pointer;
+}
+.wdm-notify-form .wdm-notify-form-input:focus-visible, .wdm-notify-form .wdm-notify-form-input:focus {
+    outline: 0;
+    box-shadow: inherit;
+}
+
+.wdm-notify-form-message {
+    color: #421802;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 140%;
+    letter-spacing: 0;
+    margin: 0;
+}
+.wdm-notify-form-message.wdm-notify-form-message--error{
+  color: red;
+}
+
+form.wdm-notify-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	const countdowns = document.querySelectorAll('[data-countdown]');
+
+	countdowns.forEach(function (countdown) {
+		const target = countdown.dataset.target;
+
+		if (!target) {
+			console.warn('Countdown target date is missing.');
+			return;
+		}
+
+		const targetDate = new Date(target).getTime();
+
+		if (isNaN(targetDate)) {
+			console.warn('Invalid countdown target date:', target);
+			return;
+		}
+
+		const daysTens = countdown.querySelector('[data-days-tens]');
+		const daysOnes = countdown.querySelector('[data-days-ones]');
+
+		const hoursTens = countdown.querySelector('[data-hours-tens]');
+		const hoursOnes = countdown.querySelector('[data-hours-ones]');
+
+		const minutesTens = countdown.querySelector('[data-minutes-tens]');
+		const minutesOnes = countdown.querySelector('[data-minutes-ones]');
+
+		const secondsTens = countdown.querySelector('[data-seconds-tens]');
+		const secondsOnes = countdown.querySelector('[data-seconds-ones]');
+
+		const expiredMessage = countdown.parentElement
+			? countdown.parentElement.querySelector('[data-countdown-expired]')
+			: null;
+
+		if (
+			!daysTens ||
+			!daysOnes ||
+			!hoursTens ||
+			!hoursOnes ||
+			!minutesTens ||
+			!minutesOnes ||
+			!secondsTens ||
+			!secondsOnes
+		) {
+			console.warn('Countdown elements are missing.', countdown);
+			return;
+		}
+
+		let timer;
+
+		function updateCountdown() {
+			const distance = targetDate - Date.now();
+
+			if (distance <= 0) {
+				countdown.hidden = true;
+
+				if (expiredMessage) {
+					expiredMessage.hidden = false;
+				}
+
+				clearInterval(timer);
+				return;
+			}
+
+			const days = Math.floor(
+				distance / (1000 * 60 * 60 * 24)
+			);
+
+			const hours = Math.floor(
+				(distance % (1000 * 60 * 60 * 24)) /
+				(1000 * 60 * 60)
+			);
+
+			const minutes = Math.floor(
+				(distance % (1000 * 60 * 60)) /
+				(1000 * 60)
+			);
+
+			const seconds = Math.floor(
+				(distance % (1000 * 60)) /
+				1000
+			);
+
+			const daysString = String(days).padStart(2, '0');
+			const hoursString = String(hours).padStart(2, '0');
+			const minutesString = String(minutes).padStart(2, '0');
+			const secondsString = String(seconds).padStart(2, '0');
+
+			daysTens.textContent = daysString.charAt(0);
+			daysOnes.textContent = daysString.charAt(1);
+
+			hoursTens.textContent = hoursString.charAt(0);
+			hoursOnes.textContent = hoursString.charAt(1);
+
+			minutesTens.textContent = minutesString.charAt(0);
+			minutesOnes.textContent = minutesString.charAt(1);
+
+			secondsTens.textContent = secondsString.charAt(0);
+			secondsOnes.textContent = secondsString.charAt(1);
+		}
+
+		updateCountdown();
+
+		timer = setInterval(updateCountdown, 1000);
+	});
+});
+</script>
+
+{% schema %}
+{
+  "name": "Drop teaser",
+  "tag": "section",
+  "class": "section-wdm-drop-teaser",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Countdown"
+    },
+    {
+      "type": "image_picker",
+      "id": "pattern_image",
+      "label": "Pattern image"
+    },
+    {
+      "type": "image_picker",
+      "id": "countdown_icon_image",
+      "label": "Countdown Icon"
+    },
+    {
+      "type": "text",
+      "id": "countdown_heading",
+      "label": "Countdown heading",
+      "default": "New drop coming soon"
+    },
+    {
+      "type": "image_picker",
+      "id": "heading_icon_image",
+      "label": "Heading Icon",
+      "info": "Add icon which will add after heading"
+    },
+    {
+      "type": "text",
+      "id": "target_date",
+      "label": "Target date and time",
+      "default": "2026-12-31T23:59:59",
+      "info": "Use YYYY-MM-DDTHH:MM:SS."
+    },
+    {
+      "type": "header",
+      "content": "Notification"
+    },
+    {
+      "type": "color",
+      "id": "notify_bg_color",
+      "label": "Background Color"
+    },
+    {
+      "type": "image_picker",
+      "id": "notify_image",
+      "label": "Notification image"
+    },
+    {
+      "type": "text",
+      "id": "notify_heading",
+      "label": "Notification heading",
+      "default": "Sneak peak..."
+    },
+    {
+      "type": "text",
+      "id": "notify_title",
+      "label": "Notification Title",
+      "default": "Get notified"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "user@gmail.com"
+    },
+    {
+      "type": "text",
+      "id": "notify_button_label",
+      "label": "Button label",
+      "default": "Notify me"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "You're on the list!"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Drop teaser",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

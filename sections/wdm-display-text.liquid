@@ -1,0 +1,302 @@
+<section class="wdm-display-text">
+	{% if section.settings.text != blank %}
+		{% if section.settings.fill_type == 'video' and section.settings.fill_video != blank %}
+		  <div class="wdm-display-text-video-wrapper">
+
+			<video class="wdm-display-text-video" autoplay muted loop playsinline crossorigin="anonymous" aria-hidden="true">
+				{% for source in section.settings.fill_video.sources %}
+					<source src="{{ source.url }}" type="{{ source.mime_type }}">
+				{% endfor %}
+			</video>
+
+			<canvas class="wdm-display-text-canvas" aria-hidden="true"></canvas>
+
+			<h2 class="wdm-display-text-heading wdm-display-text-heading--video">
+				{{ section.settings.text | escape }}
+			</h2>
+
+		  </div>
+
+		{% else %}
+
+		  <h2 class="wdm-display-text-heading" {% if section.settings.fill_image != blank %} style="background-image: url('{{ section.settings.fill_image | image_url: width: 1800 }}');"{% endif %}>
+			{{ section.settings.text | escape }}
+		  </h2>
+
+		{% endif %}
+	{% endif %}
+</section>
+
+{% stylesheet %}
+.wdm-display-text {
+	width: 100%;
+	padding: 24px;
+	text-align: center;
+}
+.wdm-display-text-heading {
+    display: inline-block;
+    max-width: 100%;
+    margin: 0;
+    font-family: Pinyon Script, cursive;
+    font-size: 300px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 120%;
+    letter-spacing: -18.75px;
+    color: #d9d9d9;
+}
+
+.wdm-display-text-heading:not(.wdm-display-text-heading--video) {
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+
+	-webkit-background-clip: text;
+	background-clip: text;
+
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+}
+.wdm-display-text-video-wrapper {
+	position: relative;
+	display: inline-block;
+	line-height: 0;
+}
+
+.wdm-display-text-video {
+	display: none;
+}
+
+.wdm-display-text-canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	pointer-events: none;
+}
+
+.wdm-display-text-heading--video {
+	position: relative;
+	z-index: 2;
+	color: #d9d9d9;
+	line-height: 1.2;
+}
+
+.wdm-display-text-video-wrapper.is-ready
+	.wdm-display-text-heading--video {
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+}
+
+{% endstylesheet %}
+
+{% if section.settings.fill_type == 'video' and section.settings.fill_video != blank %}
+<script>
+(function () {
+
+	function initDisplayTextVideo(wrapper) {
+		const video = wrapper.querySelector('.wdm-display-text-video');
+		const canvas = wrapper.querySelector('.wdm-display-text-canvas');
+		const heading = wrapper.querySelector('.wdm-display-text-heading--video');
+
+		if (!video || !canvas || !heading) {
+			return;
+		}
+
+		const ctx = canvas.getContext('2d');
+
+		if (!ctx) {
+			return;
+		}
+
+		let animationFrame;
+
+		function resizeCanvas() {
+			const rect = heading.getBoundingClientRect();
+			const dpr = window.devicePixelRatio || 1;
+
+			if (!rect.width || !rect.height) {
+				return;
+			}
+
+			canvas.width = Math.round(rect.width * dpr);
+			canvas.height = Math.round(rect.height * dpr);
+
+			canvas.style.width = rect.width + 'px';
+			canvas.style.height = rect.height + 'px';
+
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+		}
+
+		function draw() {
+			if (video.readyState < 2 ||	video.videoWidth === 0) {
+				animationFrame = requestAnimationFrame(draw);
+				return;
+			}
+
+			const width = canvas.clientWidth;
+			const height = canvas.clientHeight;
+
+			ctx.clearRect(0, 0, width, height);
+
+			const videoRatio =
+			video.videoWidth / video.videoHeight;
+
+			const canvasRatio =
+			width / height;
+
+			let drawWidth;
+			let drawHeight;
+			let offsetX;
+			let offsetY;
+
+			if (videoRatio > canvasRatio) {
+				drawHeight = height;
+				drawWidth = height * videoRatio;
+
+				offsetX = (width - drawWidth) / 2;
+				offsetY = 0;
+			} else {
+				drawWidth = width;
+				drawHeight = width / videoRatio;
+
+				offsetX = 0;
+				offsetY = (height - drawHeight) / 2;
+			}
+
+			ctx.globalCompositeOperation = 'source-over';
+
+			ctx.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+
+			ctx.globalCompositeOperation = 'destination-in';
+
+			const styles = window.getComputedStyle(heading);
+
+			const fontSize = styles.fontSize;
+			const fontFamily = styles.fontFamily;
+			const fontWeight = styles.fontWeight;
+			const fontStyle = styles.fontStyle;
+
+			ctx.font =
+			`${fontStyle} ${fontWeight} ${fontSize} ${fontFamily}`;
+
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+
+			ctx.fillStyle = '#000';
+
+			const text = heading.textContent.trim();
+
+			ctx.fillText(
+				text,
+				width / 2,
+				height / 2
+			);
+
+			ctx.globalCompositeOperation = 'source-over';
+
+			wrapper.classList.add('is-ready');
+
+			animationFrame =
+			requestAnimationFrame(draw);
+		}
+
+
+		function start() {
+			resizeCanvas();
+
+			if (document.fonts && document.fonts.ready) {
+				document.fonts.ready.then(function () {
+					resizeCanvas();
+					video.play().catch(function () {});
+					draw();
+				});
+			} else {
+				video.play().catch(function () {});
+				draw();
+			}
+		}
+
+		if (video.readyState >= 2) {
+			start();
+		} else {
+			video.addEventListener('loadeddata', start, { once: true } );
+		}
+		window.addEventListener('resize', function () {
+			resizeCanvas();
+		});
+
+		document.addEventListener('shopify:section:load',function () { resizeCanvas(); });
+
+	}
+
+	function initAll() {
+		document.querySelectorAll('.wdm-display-text-video-wrapper').forEach(function (wrapper) {
+			if (!wrapper.dataset.videoInitialized) {
+			  wrapper.dataset.videoInitialized = 'true';
+			  initDisplayTextVideo(wrapper);
+			}
+		});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener(
+		  'DOMContentLoaded',
+		  initAll
+		);
+	} else {
+		initAll();
+	}
+})();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Display text",
+  "tag": "section",
+  "class": "section-wdm-display-text",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Best sellers"
+    },
+	{
+	  "type": "select",
+	  "id": "fill_type",
+	  "label": "Fill type",
+	  "options": [
+		{
+		  "value": "image",
+		  "label": "Image"
+		},
+		{
+		  "value": "video",
+		  "label": "Video"
+		}
+	  ],
+	  "default": "image"
+	},
+    {
+      "type": "image_picker",
+      "id": "fill_image",
+      "label": "Fill image"
+    },
+	{
+	  "type": "video",
+	  "id": "fill_video",
+	  "label": "Fill video"
+	}
+  ],
+  "presets": [
+    {
+      "name": "Display text",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
