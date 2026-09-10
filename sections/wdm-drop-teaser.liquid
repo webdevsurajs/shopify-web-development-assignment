@@ -167,6 +167,7 @@
 .wdm-drop-teaser-countdown-top .wdm-drop-teaser-countdown-icon {
     margin: 0 auto;
     max-width: 120px;
+    height: auto;
 }
 .wdm-drop-teaser-heading {
     display: flex;
@@ -310,7 +311,7 @@ h3.wdm-drop-teaser-notification-title {
     font-size: 11px;
     line-height: 140%;
     letter-spacing: 0;
-    width: 80%;
+    width: 70%;
     border-bottom: 1px solid #421802;
 }
 .wdm-notify-form .wdm-notify-form-input::placeholder {
@@ -340,7 +341,7 @@ h3.wdm-drop-teaser-notification-title {
     line-height: 100%;
     padding: 16px 32px;
     padding-right: 0;
-    width: 20%;
+    width: 30%;
     border-bottom: 1px solid #421802;
     cursor: pointer;
 }
@@ -369,6 +370,92 @@ form.wdm-notify-form {
     gap: 12px;
 }
 
+@media screen and (max-width: 767px){
+  .wdm-drop-teaser-inner {
+      flex-direction: column;
+  }
+  .wdm-drop-teaser {
+      padding: 12px;
+  }
+  .wdm-drop-teaser-countdown-content {
+      padding: 48px 0px;
+      gap: 16px;
+  }
+  .wdm-drop-teaser-countdown-top .wdm-drop-teaser-countdown-icon {
+      max-width: 80px;
+  }
+  .wdm-drop-teaser-heading h2 {
+      font-size: 28px;
+  }
+  .wdm-drop-teaser-countdown-top {
+      gap: 16px;
+  }
+  .wdm-drop-teaser-heading img {
+      max-width: 18px;
+      height: 32px;
+  }
+  .wdm-countdown-digits span.wdm-countdown-tile {
+      min-width: 32px;
+      min-height: 42px;
+  }
+  .wdm-countdown-group .wdm-countdown-label {
+      font-size: 20px;
+  }
+  span.wdm-countdown-separator {
+      height: 42px;
+  }
+  .wdm-drop-teaser-notification .wdm-drop-teaser-notification-inner {
+      padding: 12px;
+  }
+  h2.wdm-drop-teaser-notification-heading {
+      font-size: 48px;
+  }
+  .wdm-notify-form .wdm-notify-form-input {
+      width: 65%;
+  }
+  .wdm-notify-form .wdm-notify-form-button {
+      width: 35%;
+      padding-left: 12px;
+  }
+}
+@media screen and (max-width: 374px) {
+    .wdm-drop-teaser-countdown-content {
+        padding: 32px 0px;
+        gap: 16px;
+    }
+	.wdm-drop-teaser-countdown-top .wdm-drop-teaser-countdown-icon {
+        max-width: 60px;
+    }
+	.wdm-countdown-digits span.wdm-countdown-tile {
+        min-width: 24px;
+        min-height: 32px;
+    }
+	.wdm-countdown-group {
+		gap: 8px;
+	}
+	.wdm-drop-teaser-heading h2 {
+        font-size: 24px;
+    }
+	.wdm-drop-teaser-notification .wdm-drop-teaser-notification-inner {
+        gap: 16px;
+    }
+	.wdm-notify-form .wdm-notify-form-button {
+        font-size: 14px;
+    }
+	.wdm-display-text-heading {
+        font-size: 60px;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 999px) {
+  .wdm-drop-teaser-inner {
+      flex-direction: column;
+  }
+  .wdm-display-text-heading {
+      font-size: 160px;
+      letter-spacing: 0;
+  }
+}
 </style>
 
 <script>
