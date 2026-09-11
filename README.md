@@ -44,3 +44,11 @@ snippets/
 assets/
 - wdm-product-card.css
 - wdm-product-card.js
+
+## Preview
+
+Live Store: https://suraj-web-dev.myshopify.com/
+
+Password: surajwebdev
+
+Direct Page: https://suraj-web-dev.myshopify.com/
