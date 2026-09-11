@@ -1,4 +1,4 @@
-<section id="wdmDropTeaser-{{ section.id }}" class="wdm-drop-teaser" data-section-id="{{ section.id }}">
+<div id="wdmDropTeaser-{{ section.id }}" class="wdm-drop-teaser" data-section-id="{{ section.id }}">
 	<div class="wdm-drop-teaser-inner">
 		<div class="wdm-drop-teaser-countdown" {% if section.settings.pattern_image != blank %} style="--wdm-pattern-image: url('{{ section.settings.pattern_image | image_url: width: 1600 }}');"{% endif %}>
 		
@@ -132,7 +132,7 @@
 			</div>
 		</div>
 	</div>
-</section>
+</div>
 
 <style>
 .wdm-drop-teaser {
@@ -416,6 +416,7 @@ form.wdm-notify-form {
   .wdm-notify-form .wdm-notify-form-button {
       width: 35%;
       padding-left: 12px;
+      font-size: 14px;
   }
 }
 @media screen and (max-width: 374px) {
@@ -434,8 +435,8 @@ form.wdm-notify-form {
 		gap: 8px;
 	}
 	.wdm-drop-teaser-heading h2 {
-        font-size: 24px;
-    }
+    font-size: 24px;
+  }
 	.wdm-drop-teaser-notification .wdm-drop-teaser-notification-inner {
         gap: 16px;
     }
@@ -613,7 +614,8 @@ document.addEventListener('DOMContentLoaded', function () {
     {
       "type": "color",
       "id": "notify_bg_color",
-      "label": "Background Color"
+      "label": "Background Color",
+      "default": "#FFFBF8"
     },
     {
       "type": "image_picker",

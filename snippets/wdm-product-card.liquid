@@ -1,0 +1,228 @@
+{% liquid
+  assign initial_variant = product.selected_or_first_available_variant
+
+  if initial_variant == blank
+    assign initial_variant = product.variants.first
+  endif
+
+  assign color_option_index = -1
+  assign color_option = blank
+
+  for option in product.options_with_values
+    assign option_name = option.name | downcase | strip
+
+    if option_name == 'color' or option_name == 'colour'
+      assign color_option_index = option.position | minus: 1
+      assign color_option = option
+      break
+    endif
+  endfor
+
+  assign is_clearance = false
+  assign is_final_sale = false
+
+  for tag in product.tags
+    assign normalized_tag = tag | downcase | strip
+
+    if normalized_tag == 'clearance'
+      assign is_clearance = true
+    endif
+
+    if normalized_tag == 'final sale' or normalized_tag == 'final-sale'
+      assign is_final_sale = true
+    endif
+  endfor
+
+  assign secondary_text = product.type
+  if product.metafields.custom.subtitle.value != blank
+    assign secondary_text = product.metafields.custom.subtitle.value
+  endif
+%}
+
+<div
+  class="wdm-product-card"
+  data-product-card
+  data-product-id="{{ product.id }}"
+>
+  <div class="wdm-product-card__media">
+    <a
+      href="{{ initial_variant.url | default: product.url }}"
+      class="wdm-product-card__image-link"
+      data-product-link
+      aria-label="{{ product.title | escape }}"
+    >
+      {% if show_badge and is_final_sale %}
+        <span class="wdm-product-card__badge">
+          Final Sale
+        </span>
+      {% endif %}
+      {% if initial_variant.featured_image %}
+        {{
+          initial_variant.featured_image
+          | image_url: width: 640
+          | image_tag:
+            widths: '214, 320, 428, 640',
+            sizes: '(max-width: 767px) 50vw, 214px',
+            loading: 'lazy',
+            class: 'wdm-product-card__image',
+            alt: product.title
+        }}
+      {% elsif product.featured_image %}
+        {{
+          product.featured_image
+          | image_url: width: 640
+          | image_tag:
+            widths: '214, 320, 428, 640',
+            sizes: '(max-width: 767px) 50vw, 214px',
+            loading: 'lazy',
+            class: 'wdm-product-card__image',
+            alt: product.title
+        }}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'wdm-product-card__placeholder' }}
+      {% endif %}
+    </a>
+
+	<div class="wdm-product-card__options">
+    {% if color_option != blank %}
+      {% assign color_count = color_option.values.size %}
+
+      <div class="wdm-product-card__swatches" data-product-swatches>
+        <div class="wdm-product-card__swatches-inner">
+
+          {% for color_value in color_option.values limit: 4 %}
+            {% assign color_variant = color_value.variant %}
+
+            {% if color_variant == blank %}
+              {% for variant in product.variants %}
+                {% if variant.options[color_option_index] == color_value.name %}
+                  {% if variant.available %}
+                    {% assign color_variant = variant %}
+                    {% break %}
+                  {% elsif color_variant == blank %}
+                    {% assign color_variant = variant %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+            {% if color_variant != blank %}
+
+              {% assign color_handle = color_value.name | handleize %}
+              {% assign color_metaobject = shop.metaobjects['shopify--color-pattern'][color_handle] %}
+
+              <button
+                type="button"
+                class="wdm-product-card__swatch{% if color_variant.id == initial_variant.id %} is-active{% endif %}"
+                data-product-swatch
+                data-variant-id="{{ color_variant.id }}"
+                data-variant-url="{{ color_variant.url }}"
+                data-variant-price="{{ color_variant.price }}"
+                data-variant-price-formatted="{{ color_variant.price | money }}"
+                data-variant-compare-price="{{ color_variant.compare_at_price | default: 0 }}"
+                data-variant-compare-formatted="{{ color_variant.compare_at_price | money }}"
+                data-variant-available="{{ color_variant.available }}"
+                data-variant-image="{% if color_variant.featured_image %}{{ color_variant.featured_image | image_url: width: 640 }}{% elsif product.featured_image %}{{ product.featured_image | image_url: width: 640 }}{% endif %}"
+                aria-label="{{ color_value.name | escape }}"
+                title="{{ color_value.name | escape }}"
+              >
+                <span
+                  class="wdm-product-card__swatch-color"
+                  {% if color_metaobject.color != blank %}
+                    style="background-color: {{ color_metaobject.color }};"
+                  {% elsif color_metaobject.image != blank %}
+                    style="background-image: url('{{ color_metaobject.image | image_url: width: 80 }}');"
+                  {% endif %}
+                ></span>
+              </button>
+
+            {% endif %}
+          {% endfor %}
+
+        </div>
+
+        {% if color_count > 4 %}
+          <span class="wdm-product-card__swatch-more" aria-hidden="true">
+            {{ 'icon-add.svg' | inline_asset_content }}
+          </span>
+        {% endif %}
+
+      </div>
+    {% endif %}
+
+    <button
+      type="button"
+      class="wdm-product-card__quick-add"
+      data-quick-add
+      data-variant-id="{{ initial_variant.id }}"
+      data-variant-available="{{ initial_variant.available }}"
+      aria-label="{% if initial_variant.available %}Add {{ product.title | escape }} to cart{% else %}{{ product.title | escape }} is sold out{% endif %}"
+    >
+      {{ 'icon-quick-add.svg' | inline_asset_content }}
+
+    </button>
+
+    <span
+      class="wdm-product-card__quick-add-message"
+      data-quick-add-message
+      role="status"
+      aria-live="polite"
+    ></span>
+	
+	</div>
+  </div>
+
+  <div class="wdm-product-card__content">
+	  {% if is_clearance %}
+      <p class="wdm-product-card__badge--clearance">
+        Clearance
+      </p>
+    {% endif %}
+	
+    <a
+      href="{{ initial_variant.url | default: product.url }}"
+      class="wdm-product-card__title"
+      data-product-link
+    >
+      {{ product.title | escape }}
+    </a>
+
+    
+    {% if show_vendor and product.vendor != blank %}
+      <div class="wdm-product-card__vendor" data-product-vendor>
+        {{ product.vendor | escape }}
+      </div>
+    {% endif %}
+
+    {% if show_secondary_text and secondary_text != blank %}
+      <div class="wdm-product-card__secondary">
+        {{ secondary_text | escape }}
+      </div>
+    {% endif %}
+
+    <div class="wdm-product-card__price" data-product-price>
+      <span data-current-price>
+        {{ initial_variant.price | money }}
+      </span>
+
+      <s
+        data-compare-price
+        {% unless initial_variant.compare_at_price > initial_variant.price %}
+          hidden
+        {% endunless %}
+      >
+        {% if initial_variant.compare_at_price > initial_variant.price %}
+          {{ initial_variant.compare_at_price | money }}
+        {% endif %}
+      </s>
+    </div>
+
+    <span
+      class="wdm-product-card__sold-out"
+      data-sold-out
+      {% if initial_variant.available %}hidden{% endif %}
+    >
+      Sold out
+    </span>
+  </div>
+</div>
