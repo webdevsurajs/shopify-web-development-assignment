@@ -33,14 +33,14 @@ The Figma shows Days, Hours and Seconds. I added Minutes to make the countdown m
 
 text
 sections/
-├── wdm-hero-action.liquid
-├── wdm-drop-teaser.liquid
-├── wdm-display-text.liquid
-└── wdm-product-grid.liquid
+- wdm-hero-action.liquid
+- wdm-drop-teaser.liquid
+- wdm-display-text.liquid
+- wdm-product-grid.liquid
 
 snippets/
-└── wdm-product-card.liquid
+- wdm-product-card.liquid
 
 assets/
-├── wdm-product-card.css
-└── wdm-product-card.js
+- wdm-product-card.css
+- wdm-product-card.js
