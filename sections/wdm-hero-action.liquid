@@ -1,52 +1,66 @@
-{% liquid
-  assign hero_image = section.settings.background_image
-  assign headline_image = section.settings.headline_image
-  assign headline_text = section.settings.heading | strip
-  assign collection = section.settings.collection
-%}
-
-<section class="wdm-hero">
-  {% if section.settings.background_image %}
-    {{
-      section.settings.background_image
-      | image_url: width: 2400
-      | image_tag:
-        widths: '750, 1100, 1500, 2000, 2400',
-        sizes: '100vw',
-        loading: 'eager',
-        class: 'wdm-hero__image',
-        alt: ''
-    }}
-  {% endif %}
-
-  <div class="wdm-hero__content">
-    {% if section.settings.headline_image %}
-      {{
-        section.settings.headline_image
-        | image_url: width: 1200
-        | image_tag:
-          widths: '400, 600, 800, 1000, 1200',
-          sizes: '60vw',
-          loading: 'eager',
-          alt: section.settings.headline_alt
-      }}
-    {% else %}
-      <h1>{{ section.settings.heading | escape }}</h1>
-    {% endif %}
-
-    {% if section.settings.button_label != blank and section.settings.collection != blank %}
-      <a href="{{ section.settings.collection.url }}" class="wdm-hero__button">
-        {{ section.settings.button_label | escape }}
-      </a>
-    {% endif %}
+<section class="wdm-hero" data-hero-slider data-autoplay="{{ section.settings.autoplay }}" data-autoplay-speed="{{ section.settings.autoplay_speed | times: 1000 }}">
+  <div class="wdm-hero__slides">
+    {% for block in section.blocks %}
+      <div class="wdm-hero__slide{% if forloop.first %} is-active{% endif %}" data-hero-slide {{ block.shopify_attributes }}>
+        {% if block.settings.background_image %}
+          {{ block.settings.background_image | image_url: width: 2400 | image_tag: widths: '750, 1100, 1500, 2000, 2400', sizes: '100vw', loading: 'lazy', class: 'wdm-hero__image', alt: '' }}
+        {% endif %}
+        <div class="wdm-hero__content">
+          {% if block.settings.headline_image %}
+            {{ block.settings.headline_image | image_url: width: 1200 | image_tag: widths: '400, 600, 800, 1000, 1200', sizes: '60vw', loading: 'lazy', alt: block.settings.headline_alt }}
+          {% elsif block.settings.heading != blank %}
+            {% if forloop.first %}
+              <h1>{{ block.settings.heading | escape }}</h1>
+            {% else %}
+              <h2 class="wdm-hero__heading">{{ block.settings.heading | escape }}</h2>
+            {% endif %}
+          {% endif %}
+          {% if block.settings.button_label != blank and block.settings.collection != blank %}
+            <a href="{{ block.settings.collection.url }}" class="wdm-hero__button">{{ block.settings.button_label | escape }}</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
   </div>
 
   {% if section.settings.show_reviews %}
-    <div class="wdm-hero__reviews">Reviews</div>
+    <div class="wdm-hero__reviews">{{ section.settings.reviews_tab_text | escape }}</div>
+  {% endif %}
+
+  {% if section.blocks.size > 1 %}
+    {% if section.settings.show_arrows %}
+      <button type="button" class="wdm-hero__arrow wdm-hero__arrow--prev" data-hero-prev aria-label="Previous slide">‹</button>
+      <button type="button" class="wdm-hero__arrow wdm-hero__arrow--next" data-hero-next aria-label="Next slide">›</button>
+    {% endif %}
+
+    {% if section.settings.show_dots %}
+      <div class="wdm-hero__dots" role="tablist" aria-label="Hero slides">
+        {% for block in section.blocks %}
+          <button type="button" class="wdm-hero__dot{% if forloop.first %} is-active{% endif %}" data-hero-dot="{{ forloop.index0 }}" role="tab" aria-label="Go to slide {{ forloop.index }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"></button>
+        {% endfor %}
+      </div>
+    {% endif %}
   {% endif %}
 </section>
 
 <style>
+.wdm-hero__slides { position: relative; overflow: hidden; }
+.wdm-hero__slide { position: relative; display: none; }
+.wdm-hero__slide.is-active { display: block; }
+.wdm-hero__arrow { position:absolute; top:50%; z-index:3; width:40px; height:40px; padding:0; transform:translateY(-50%); border:0; border-radius:50%; background:rgba(255,255,255,.85); cursor:pointer; font-size:30px; line-height:1; }
+.wdm-hero__arrow--prev { left:20px; }
+.wdm-hero__arrow--next { right:20px; }
+.wdm-hero__dots { position:absolute; left:50%; bottom:20px; z-index:3; display:flex; gap:8px; transform:translateX(-50%); }
+.wdm-hero__dot { width:9px; height:9px; padding:0; border:1px solid #fff; border-radius:50%; background:transparent; cursor:pointer; }
+.wdm-hero__dot.is-active { background:#fff; }
+.wdm-hero__arrow:focus-visible, .wdm-hero__dot:focus-visible { outline:2px solid #fff; outline-offset:3px; }
+@media screen and (max-width:767px) {
+  .wdm-hero__arrow { width:32px; height:32px; font-size:24px; }
+  .wdm-hero__arrow--prev { left:10px; }
+  .wdm-hero__arrow--next { right:10px; }
+  .wdm-hero__dots { bottom:10px; }
+}
+
 .wdm-hero {
 	position: relative;
 	overflow: hidden;
@@ -71,10 +85,21 @@
 }
 
 .wdm-hero__content h1,
+.wdm-hero__content h2,
 .wdm-hero__content img {
 	width: 100%;
     margin: 0;
     height: auto;	
+}
+
+.wdm-hero__content h2, .wdm-hero__content h1 {
+    font-size: 60px;
+    margin: 0;
+    color: #fff;
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    line-height: 120%;
 }
 
 .wdm-hero__button {
@@ -126,6 +151,10 @@
 		right: 0;
 		font-size: 10px;
 	}
+
+  .wdm-hero__content h2, .wdm-hero__content h1 {
+    font-size: 32px;
+}
 }
 
 @media screen and (max-width: 374px) {
@@ -135,8 +164,78 @@
     }
 }
 
-</style>
 
+
+.wdm-hero__slides { position: relative; overflow: hidden; }
+.wdm-hero__slide { position: relative; display: none; }
+.wdm-hero__slide.is-active { display: block; }
+.wdm-hero__arrow { position:absolute; top:50%; z-index:3; width:40px; height:40px; padding:0; transform:translateY(-50%); border:0; border-radius:50%; background:rgba(255,255,255,.85); cursor:pointer; font-size:30px; line-height:1; }
+.wdm-hero__arrow--prev { left:20px; }
+.wdm-hero__arrow--next { right:20px; }
+.wdm-hero__dots { position:absolute; left:50%; bottom:20px; z-index:3; display:flex; gap:8px; transform:translateX(-50%); }
+.wdm-hero__dot { width:9px; height:9px; padding:0; border:1px solid #fff; border-radius:50%; background:transparent; cursor:pointer; }
+.wdm-hero__dot.is-active { background:#fff; }
+.wdm-hero__arrow:focus-visible, .wdm-hero__dot:focus-visible { outline:2px solid #fff; outline-offset:3px; }
+@media screen and (max-width:767px) {
+  .wdm-hero__arrow { width:32px; height:32px; font-size:24px; }
+  .wdm-hero__arrow--prev { left:10px; }
+  .wdm-hero__arrow--next { right:10px; }
+  .wdm-hero__dots { bottom:10px; }
+}
+
+</style>
+<script>
+(function () {
+  function init(section) {
+    if (!section || section.dataset.heroInitialized === 'true') return;
+    const slides = [...section.querySelectorAll('[data-hero-slide]')];
+    if (slides.length < 2) return;
+
+    const dots = [...section.querySelectorAll('[data-hero-dot]')];
+    const prev = section.querySelector('[data-hero-prev]');
+    const next = section.querySelector('[data-hero-next]');
+    const autoplay = section.dataset.autoplay === 'true';
+    const speed = Number(section.dataset.autoplaySpeed) || 5000;
+    let current = 0;
+    let timer;
+
+    function show(index) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle('is-active', i === current));
+      dots.forEach((dot, i) => {
+        const active = i === current;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    function restart() {
+      clearInterval(timer);
+      if (autoplay) timer = setInterval(() => show(current + 1), speed);
+    }
+
+    prev?.addEventListener('click', () => { show(current - 1); restart(); });
+    next?.addEventListener('click', () => { show(current + 1); restart(); });
+    dots.forEach(dot => dot.addEventListener('click', () => { show(Number(dot.dataset.heroDot)); restart(); }));
+
+    section.addEventListener('mouseenter', () => clearInterval(timer));
+    section.addEventListener('mouseleave', restart);
+    section.addEventListener('focusin', () => clearInterval(timer));
+    section.addEventListener('focusout', restart);
+
+    show(0);
+    restart();
+    section.dataset.heroInitialized = 'true';
+  }
+
+  function initAll(root) {
+    (root || document).querySelectorAll('[data-hero-slider]').forEach(init);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => initAll());
+  document.addEventListener('shopify:section:load', event => initAll(event.target));
+})();
+</script>
 {% schema %}
 {
   "name": "Hero Action",
@@ -144,52 +243,32 @@
   "class": "section-wdm-hero-action",
   "settings": [
     {
-      "type": "header",
-      "content": "Hero Action Media"
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": true
     },
     {
-      "type": "image_picker",
-      "id": "background_image",
-      "label": "Background image"
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
     },
     {
-      "type": "image_picker",
-      "id": "headline_image",
-      "label": "Headline image",
-      "info": "Use the headline lockup here. If left empty, the text headline is used."
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
     },
     {
-      "type": "text",
-      "id": "headline_alt",
-      "label": "Headline image alt text",
-      "default": "Spring Break",
-      "info": "Alt text for Headline image"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Headline text",
-      "default": "Spring Break",
-      "info": "Used when no headline image is selected."
-    },
-    {
-      "type": "header",
-      "content": "Call to action"
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Button label",
-      "default": "Shop the collection"
-    },
-    {
-      "type": "collection",
-      "id": "collection",
-      "label": "Collection"
-    },
-    {
-      "type": "header",
-      "content": "Reviews"
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show dots",
+      "default": true
     },
     {
       "type": "checkbox",
@@ -200,14 +279,59 @@
     {
       "type": "text",
       "id": "reviews_tab_text",
-      "label": "Reviews tab Text",
+      "label": "Reviews tab text",
       "default": "Reviews"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "background_image",
+          "label": "Background image"
+        },
+        {
+          "type": "image_picker",
+          "id": "headline_image",
+          "label": "Headline image"
+        },
+        {
+          "type": "text",
+          "id": "headline_alt",
+          "label": "Headline image alt text",
+          "default": "Spring Break"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Headline text",
+          "default": "Spring Break"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Shop the collection"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
     }
   ],
   "presets": [
     {
       "name": "Hero Action",
-      "category": "Custom"
+      "category": "Custom",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
     }
   ]
 }
