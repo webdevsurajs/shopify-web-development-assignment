@@ -52,3 +52,21 @@ Live Store: https://suraj-web-dev.myshopify.com/
 Password: surajwebdev
 
 Direct Page: https://suraj-web-dev.myshopify.com/
+
+## Repository
+
+This repository contains the Shopify theme used for the assignment.
+
+The implementation is built on the Dawn theme. The main custom work is contained in:
+
+- sections/wdm-hero-action.liquid
+- sections/wdm-drop-teaser.liquid
+- sections/wdm-display-text.liquid
+- sections/wdm-product-grid.liquid
+- snippets/wdm-product-card.liquid
+- assets/wdm-product-card.css
+- assets/wdm-product-card.js
+- assets/icon-add.svg
+- assets/icon-quick-add.svg
+
+The remaining theme files are part of the base Dawn theme.

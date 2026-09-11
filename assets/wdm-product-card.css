@@ -200,7 +200,7 @@ span.wdm-product-card__quick-add-message.is-visible {
 
 @media (max-width: 767px) {
   .wdm-product-grid-section {
-      padding: 24px;
+      padding: 12px;
   }
 }
 @media (max-width: 991px) {
